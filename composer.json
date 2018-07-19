@@ -1,0 +1,28 @@
+{
+    "name": "infra/template",
+    "description": "Infra framework template.",
+    "authors": [
+        {
+            "name": "xiajiemin",
+            "email": "xiajiemin@zuzuche.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "infra/infra": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.7.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "tests\\": "tests/"
+        }
+    }
+}

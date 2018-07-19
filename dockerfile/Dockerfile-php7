@@ -1,0 +1,64 @@
+FROM webdevops/php-nginx-dev:7.1
+
+WORKDIR /
+
+RUN apt-get update -y
+
+RUN apt-get install -y vim
+
+# 安装composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    chmod a+x composer.phar && \
+    mv composer.phar /usr/bin/composer
+
+WORKDIR /tmp
+
+# php-memcache
+RUN apt-get install -y zlib1g-dev
+RUN wget -O pecl-memcache-php7.zip https://github.com/websupport-sk/pecl-memcache/archive/php7.zip && \
+    unzip pecl-memcache-php7.zip && \
+    cd pecl-memcache-php7 && \
+    phpize && \
+    ./configure --with-php-config=php-config && \
+    make && make install && \
+    echo 'extension = "memcache.so"' > /usr/local/etc/php/conf.d/memcache.ini
+
+# php-memcached
+RUN apt-get install -y libmemcached-dev
+RUN wget -O pecl-memcached.zip https://github.com/php-memcached-dev/php-memcached/archive/v3.0.4.zip && \
+    unzip pecl-memcached.zip && \
+    cd php-memcached-3.0.4 && \
+    phpize && \
+    ./configure && \
+    make && make install && \
+    echo 'extension = "memcached.so"' > /usr/local/etc/php/conf.d/memcached.ini
+
+# php-monogodb
+RUN wget -O pecl-mongodb.tgz https://pecl.php.net/get/mongodb-1.4.3.tgz && \
+    tar zxvf pecl-mongodb.tgz && \
+    cd mongodb-1.4.3 && \
+    phpize && \
+    ./configure && \
+    make && make install && \
+    echo 'extension = "mongodb.so"' > /usr/local/etc/php/conf.d/mongodb.ini
+
+# php-gearman
+RUN apt-get install -y gearman libgearman-dev
+RUN wget -O pecl-gearman.zip https://github.com/wcgallego/pecl-gearman/archive/gearman-2.0.3.zip && \
+  unzip pecl-gearman.zip && \
+  cd pecl-gearman-gearman-2.0.3 && \
+  phpize && \
+  ./configure && \
+  make && make install && \
+  echo 'extension=gearman.so' > /usr/local/etc/php/conf.d/gearman.ini
+
+COPY gearman-worker.php /srv/gearman-worker.php
+COPY php-gearman.conf /opt/docker/etc/supervisor.d/php-gearman.conf
+COPY gearmand.conf /opt/docker/etc/supervisor.d/gearmand.conf
+
+# 日志目录
+RUN mkdir -m 777 /var/log/app
+
+WORKDIR /project

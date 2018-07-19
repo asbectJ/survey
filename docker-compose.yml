@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  php:
+    build:
+      context: ./dockerfile
+      dockerfile: Dockerfile-php7
+    volumes:
+      - .:/project
+    links:
+      - mysql
+      - memcache
+      - mongo
+    environment:
+      - WEB_DOCUMENT_ROOT=/project/public
+    ports:
+      - 8080:80
+
+  mysql:
+    image: mysql:5.6
+    environment:
+      - MYSQL_DATABASE=app
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 12306:3306
+
+  memcache:
+    image: memcached:1.5.7
+
+  mongo:
+    image: mongo:3.6.3-jessie

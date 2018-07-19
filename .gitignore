@@ -1,0 +1,15 @@
+/vendor
+.env
+.buildpath
+.project
+.settings
+
+_skins_tmp
+
+
+GPATH
+GRTAGS
+GTAGS
+
+/composer.lock
+/.vagrant
